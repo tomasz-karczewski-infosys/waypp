@@ -168,9 +168,9 @@
 #include "viewporter-client-protocol.h"
 #endif
 
-#if HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1
+//#if HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1
 #include "xdg-output-unstable-v1-client-protocol.h"
-#endif
+//#endif
 
 #if HAS_WAYLAND_PROTOCOL_XDG_ACTIVATION_V1
 #include "xdg-activation-v1-client-protocol.h"

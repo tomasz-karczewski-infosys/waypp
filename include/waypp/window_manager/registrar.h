@@ -119,6 +119,13 @@ class Registrar {
 
 #endif
 
+#else
+
+  [[nodiscard]] zxdg_output_manager_v1* get_xdg_output_manager() const {
+    return nullptr;
+  }
+
+
 #endif
 
 #if ENABLE_AGL_SHELL_CLIENT
@@ -260,6 +267,8 @@ class Registrar {
   wl_shm* wl_shm_{};
   wl_subcompositor* wl_subcompositor_{};
 
+  zxdg_output_manager_v1* zxdg_output_manager_v1_{};
+
 #if ENABLE_XDG_CLIENT
   xdg_wm_base* xdg_wm_base_{};
 #if HAS_WAYLAND_PROTOCOL_XDG_DECORATION_UNSTABLE_V1
@@ -267,7 +276,7 @@ class Registrar {
   zxdg_decoration_manager_v1* zxdg_decoration_manager_v1_{};
 #endif
 #if HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1
-  zxdg_output_manager_v1* zxdg_output_manager_v1_{};
+
 #endif
 #if HAS_WAYLAND_PROTOCOL_XDG_ACTIVATION_V1
   struct xdg_activation_v1* xdg_activation_v1_{};
