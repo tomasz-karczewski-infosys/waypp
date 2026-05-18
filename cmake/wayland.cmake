@@ -56,11 +56,7 @@ macro(wayland_generate protocol_file output_file)
     list(APPEND WAYLAND_PROTOCOL_SOURCES ${output_file}.c)
 endmacro()
 
-macro(add_protocol protocol_file announce)
-	#    set(announce TRUE)
-	#    if(ARGC GREATER 1)
-	#      set(announce "${ARGV1}")
-	#    endif()    
+macro(add_protocol protocol_file)
     get_filename_component(PROTOCOL_PREFIX ${protocol_file} NAME_WLE)
     string(TOUPPER ${PROTOCOL_PREFIX} PROTOCOL_FILE_UPPER)
     string(REPLACE "-" "_" PROTOCOL_VAR ${PROTOCOL_FILE_UPPER})
@@ -69,7 +65,7 @@ macro(add_protocol protocol_file announce)
         wayland_generate(
                 ${protocol_file}
                 ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/protocols/${PROTOCOL_PREFIX}-client-protocol)
-        set(HAS_WAYLAND_PROTOCOL_${PROTOCOL_VAR} ${announce})
+        set(HAS_WAYLAND_PROTOCOL_${PROTOCOL_VAR} TRUE)
         list(APPEND LIST_WAYLAND_PROTOCOLS -DHAS_WAYLAND_PROTOCOL_${PROTOCOL_VAR})
     else ()
         set(HAS_WAYLAND_PROTOCOL_${PROTOCOL_VAR} FALSE)
@@ -85,89 +81,91 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/protocols)
 #
 
 if (ENABLE_XDG_CLIENT)
-    add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/xdg-shell/xdg-shell.xml TRUE)
-    add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/xdg-activation/xdg-activation-v1.xml TRUE)
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/xdg-shell/xdg-shell.xml)
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/xdg-activation/xdg-activation-v1.xml)
     message(STATUS "XDG Activation ........ ${HAS_WAYLAND_PROTOCOL_XDG_ACTIVATION_V1}")
-    
-    add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml TRUE)
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-output/xdg-output-unstable-v1.xml)
+    message(STATUS "XDG Output Manager .... ${HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1}")
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml)
     message(STATUS "XDG Decoration ........ ${HAS_WAYLAND_PROTOCOL_XDG_DECORATION_UNSTABLE_V1}")
+else ()
+    # still need to generate xdg-output stubs, they're unconditionally used in the implementation
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-output/xdg-output-unstable-v1.xml)
+    # but do not announce the support
+    set(HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1 FALSE)
 endif ()
 
-# unconditionally required by waypp implementation, so make sure the bindings are created
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-output/xdg-output-unstable-v1.xml FALSE)
-message(STATUS "XDG Output Manager .... ${HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1}")
-
 if (ENABLE_AGL_SHELL_CLIENT)
-	add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-shell.xml TRUE)
-	add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-shell-desktop.xml TRUE)
-	add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-screenshooter.xml TRUE)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-shell.xml)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-shell-desktop.xml)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/agl/protocol/agl-screenshooter.xml)
 endif ()
 
 if (ENABLE_IVI_SHELL_CLIENT)
-	add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/ivi-application.xml TRUE)
-	message(STATUS "IVI Application ....... ${HAS_WAYLAND_PROTOCOL_IVI_APPLICATION}")
-	add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/ivi-wm.xml TRUE)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/ivi-application.xml)
+    message(STATUS "IVI Application ....... ${HAS_WAYLAND_PROTOCOL_IVI_APPLICATION}")
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/ivi-wm.xml)
     message(STATUS "IVI WM ................ ${HAS_WAYLAND_PROTOCOL_IVI_WM}")
 endif ()
 
 if (ENABLE_SIMPLE_SHELL_CLIENT)
-    add_protocol(${PROJECT_SOURCE_DIR}/third_party/rdk/protocol/simpleshell.xml TRUE)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/rdk/protocol/simpleshell.xml)
 endif ()
 
-add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/weston-output-capture.xml TRUE)
+add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/weston-output-capture.xml)
 
 
 #
 # Stable
 #
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/linux-dmabuf/linux-dmabuf-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/linux-dmabuf/linux-dmabuf-v1.xml)
 message(STATUS "Linux DMA Buffer ...... ${HAS_WAYLAND_PROTOCOL_LINUX_DMABUF_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/presentation-time/presentation-time.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/presentation-time/presentation-time.xml)
 message(STATUS "Presentation Time ..... ${HAS_WAYLAND_PROTOCOL_PRESENTATION_TIME}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/viewporter/viewporter.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/stable/viewporter/viewporter.xml)
 message(STATUS "Viewporter ............ ${HAS_WAYLAND_PROTOCOL_VIEWPORTER}")
 
 #
 # Staging
 #
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/cursor-shape/cursor-shape-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/cursor-shape/cursor-shape-v1.xml)
 message(STATUS "Cursor Shape .......... ${HAS_WAYLAND_PROTOCOL_CURSOR_SHAPE_V1}")
 
 if (ENABLE_DRM_LEASE_CLIENT)
-	add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/drm-lease/drm-lease-v1.xml TRUE)
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/drm-lease/drm-lease-v1.xml)
 endif ()
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/fractional-scale/fractional-scale-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/fractional-scale/fractional-scale-v1.xml)
 message(STATUS "Fractional Scale ...... ${HAS_WAYLAND_PROTOCOL_FRACTIONAL_SCALE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/tearing-control/tearing-control-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/staging/tearing-control/tearing-control-v1.xml)
 message(STATUS "Tearing Control ....... ${HAS_WAYLAND_PROTOCOL_TEARING_CONTROL_V1}")
 
 
 #
 # Unstable
 #
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/tablet/tablet-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/tablet/tablet-unstable-v1.xml)
 message(STATUS "Tablet v1 ............. ${HAS_WAYLAND_PROTOCOL_TABLET_UNSTABLE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/tablet/tablet-unstable-v2.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/tablet/tablet-unstable-v2.xml)
 message(STATUS "Tablet v2 ............. ${HAS_WAYLAND_PROTOCOL_TABLET_UNSTABLE_V2}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml)
 message(STATUS "Idle Inhibit .......... ${HAS_WAYLAND_PROTOCOL_IDLE_INHIBIT_UNSTABLE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml)
 message(STATUS "Pointer Constraints ... ${HAS_WAYLAND_PROTOCOL_POINTER_CONSTRAINTS_UNSTABLE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/pointer-gestures/pointer-gestures-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/pointer-gestures/pointer-gestures-unstable-v1.xml)
 message(STATUS "Pointer Gestures ...... ${HAS_WAYLAND_PROTOCOL_POINTER_GESTURES_UNSTABLE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/relative-pointer/relative-pointer-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/relative-pointer/relative-pointer-unstable-v1.xml)
 message(STATUS "Relative Pointer ...... ${HAS_WAYLAND_PROTOCOL_RELATIVE_POINTER_UNSTABLE_V1}")
 
-add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/primary-selection/primary-selection-unstable-v1.xml TRUE)
+add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/primary-selection/primary-selection-unstable-v1.xml)
 message(STATUS "Primary Selection  .... ${HAS_WAYLAND_PROTOCOL_PRIMARY_SELECTION_UNSTABLE_V1}")
 
 

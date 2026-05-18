@@ -78,17 +78,13 @@ class Registrar {
 
   [[nodiscard]] wl_shm* get_shm() const { return wl_shm_; }
 
-#if ENABLE_XDG_CLIENT
-
-  [[nodiscard]] xdg_wm_base* get_xdg_wm_base() const { return xdg_wm_base_; }
-
-#if HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1
-
   [[nodiscard]] zxdg_output_manager_v1* get_xdg_output_manager() const {
     return zxdg_output_manager_v1_;
   }
 
-#endif
+#if ENABLE_XDG_CLIENT
+
+  [[nodiscard]] xdg_wm_base* get_xdg_wm_base() const { return xdg_wm_base_; }
 
 #if HAS_WAYLAND_PROTOCOL_XDG_ACTIVATION_V1
 
@@ -118,13 +114,6 @@ class Registrar {
   }
 
 #endif
-
-#else
-
-  [[nodiscard]] zxdg_output_manager_v1* get_xdg_output_manager() const {
-    return nullptr;
-  }
-
 
 #endif
 
@@ -274,9 +263,6 @@ class Registrar {
 #if HAS_WAYLAND_PROTOCOL_XDG_DECORATION_UNSTABLE_V1
   // Per-display singleton — used to create per-window decoration objects.
   zxdg_decoration_manager_v1* zxdg_decoration_manager_v1_{};
-#endif
-#if HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1
-
 #endif
 #if HAS_WAYLAND_PROTOCOL_XDG_ACTIVATION_V1
   struct xdg_activation_v1* xdg_activation_v1_{};
