@@ -22,6 +22,7 @@ option(ENABLE_XDG_CLIENT "Enable XDG Client" ON)
 option(ENABLE_AGL_SHELL_CLIENT "Enable AGL shell Client" ON)
 option(ENABLE_IVI_SHELL_CLIENT "Enable ivi-shell Client" OFF)
 option(ENABLE_DRM_LEASE_CLIENT "Enable DRM Lease Client" OFF)
+option(ENABLE_SIMPLE_SHELL_CLIENT "Enable RDK simple_shell Client" OFF)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET wayland-client wayland-cursor xkbcommon)
@@ -105,6 +106,10 @@ if (ENABLE_IVI_SHELL_CLIENT)
     message(STATUS "IVI Application ....... ${HAS_WAYLAND_PROTOCOL_IVI_APPLICATION}")
     add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/ivi-wm.xml)
     message(STATUS "IVI WM ................ ${HAS_WAYLAND_PROTOCOL_IVI_WM}")
+endif ()
+
+if (ENABLE_SIMPLE_SHELL_CLIENT)
+    add_protocol(${PROJECT_SOURCE_DIR}/third_party/rdk/protocol/simpleshell.xml)
 endif ()
 
 add_protocol(${PROJECT_SOURCE_DIR}/third_party/weston/protocol/weston-output-capture.xml)
