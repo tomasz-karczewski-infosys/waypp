@@ -87,6 +87,11 @@ if (ENABLE_XDG_CLIENT)
     message(STATUS "XDG Output Manager .... ${HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1}")
     add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml)
     message(STATUS "XDG Decoration ........ ${HAS_WAYLAND_PROTOCOL_XDG_DECORATION_UNSTABLE_V1}")
+else ()
+    # still need to generate xdg-output stubs, they're unconditionally used in the implementation
+    add_protocol(${WAYLAND_PROTOCOLS_BASE}/unstable/xdg-output/xdg-output-unstable-v1.xml)
+    # but do not announce the support
+    set(HAS_WAYLAND_PROTOCOL_XDG_OUTPUT_UNSTABLE_V1 FALSE)
 endif ()
 
 if (ENABLE_AGL_SHELL_CLIENT)
